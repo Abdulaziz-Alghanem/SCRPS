@@ -1,0 +1,328 @@
+---
+title: "SCRPS For Different Distributions"
+output: html_document
+date: '2022-06-08'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# SCRPS for Normal distribution 
+Implementation using the following expression:   
+$\text{SCRPS}(\text{N}(\mu, \sigma^2),y) = -\sqrt\pi \phi(z) - \frac{\sqrt\pi z}{2}(2\Phi(z)-1) - \frac{1}{2} \log(\frac{2\sigma}{\sqrt\pi})\\ \text{wheer} \ z = \frac{\mu - y}{\sigma} \  \text{and} \  \phi, \Phi \text{are, respectively,  the  density function and the cumulative distribution function of the standard normal distribution.}$
+
+
+```{r}
+
+SCRPS_norm <- function(y, mean = 0, sd = 1) {
+  z <- (mean-y) /sd
+  score <- -sqrt(pi)*dnorm(z) - sqrt(pi)*z/2 * (2*pnorm(z) - 1) - 0.5*log(2*sd/sqrt(pi))
+  
+  return(score)
+}
+
+
+```
+
+# SCRPS for exponential distribution 
+
+Implementation using the following expression:   
+$\text{SCRPS}(\text{Exp}(\lambda),y) = -\frac{E_1}{E_2} - \frac{1}{2}\log(E_2)$  
+
+where 
+
+$$ E_1 =   \left\{
+\begin{array}{ll}
+      \frac{1}{\lambda} - y & y <= 0 \\
+      \frac{2}{\lambda}e^{-\lambda y} + y -\frac1{\lambda} & 0 < y \\
+\end{array} 
+\right.  $$
+
+and 
+
+$E_2 = \frac{1}{\lambda}$
+
+```{r}
+SCRPS_exp <- function(y, l = 1){
+  if (y <= 0) {
+    E1 <- 1/l - y
+  } else {
+    E1 <- (2*exp(-l*y))/l + y - 1/l
+  }
+  E2 <- 1/l
+  score <- -E1/E2 - 0.5*log(E2)
+  return(score)
+}
+
+```
+
+
+
+
+
+
+
+# SCRPS for uniform distribution 
+
+Implementation using the following expression:
+
+$\text{SCRPS}(\text{unif}(a, b),y) = -\frac{E_1}{E_2} - \frac{1}{2}\log(E_2)$  
+
+where 
+$$ E_1 =   \left\{
+\begin{array}{ll}
+      \frac{b+a}{2} - y & y <= a \\
+      \frac{y(y-b-a) + \frac{a^2 + b^2}{2}}{b-a} & a < y < b \\
+      y - \frac{b+a}{2} & b <= y \\
+\end{array} 
+\right.  $$
+
+and 
+
+$E_2 = \frac{b-a}{3}$
+
+```{r}
+SCRPS_unif <- function(y, min = 0, max = 1){
+  if (y <= min) {
+    E1 <- 0.5*(min + max) - y
+  } else if (y >= max) {
+    E1 <- y - 0.5*(min + max)
+  } else {
+    E1 <- (y*(y-min-max)+0.5*(min^2 + max^2))/(max-min)
+  }
+ 
+  E2 <- (max - min)/(3)
+  score <- -E1/E2 -0.5*log(E2)
+  return(score)
+}
+
+```
+
+
+
+
+
+
+
+
+
+# SCRPS for exponential distribution with flexible location and scale
+
+Implementation using the following expression:   
+$\text{SCRPS}(\text{Exp}(\lambda,\text{location } a, \text{scale } b),y) = -\frac{E_1}{E_2} - \frac{1}{2}\log(E_2)$  
+
+where 
+
+$$ E_1 =   \left\{
+\begin{array}{ll}
+      a + \frac{b}{\lambda} - y & y <= a \\
+      \frac{b}{\lambda}(2e^{-\lambda (\frac{y-a}{b})} - 1) + y -a & a < y \\
+\end{array} 
+\right.  $$
+
+and 
+
+$E_2 = \frac{b}{\lambda}$
+
+```{r}
+SCRPS_exp2 <- function(y, l = 1, a = 0, b = 1){
+  if (y <= a) {
+    E1 <- a + b/l - y
+  } else {
+    E1 <- (b/l)*(2*exp(-l*((y-a)/b)) - 1) + y - a
+  }
+  E2 <- b/l
+  score <- -E1/E2 - 0.5*log(E2)
+  return(score)
+}
+
+```
+
+
+
+
+
+
+
+# SCRPS for logistic distribution 
+
+Implementation using the following expression:   
+$\text{SCRPS}(\text{Logis}(0, 1),y) = -\frac{E_1}{E_2} - \frac{1}{2}\log{E_2}$  
+
+where 
+
+$$ E_1 = 2 \ log (1 + e^y ) - y $$
+
+and 
+
+$E_2 = 2$ 
+
+And then  
+$\text{SCRPS}(\text{Logis}(\mu, \sigma),y) = \text{SCRPS}(\text{Logis}(0, 1),\frac{y-\mu}{\sigma}) - \frac{1}{2} \log {\sigma}$
+
+```{r}
+SCRPS_logis <- function(y, mu = 0, sd = 1){
+  y <- (y-mu)/sd
+  E1 <- 2*log(1 + exp(y)) -y 
+  
+  E2 <- 2
+  score <- -E1/E2 - 0.5*log(E2)
+  score <- score - 0.5 * log(sd)
+  return(score)
+}
+
+```
+
+
+
+
+
+# SCRPS for laplace distribution 
+
+Implementation using the following expression:   
+$\text{SCRPS}(\text{lapl}(0, 1),y) = -\frac{E_1}{E_2} - \frac{1}{2}\log(E_2)$  
+
+where 
+
+$$ E_1 =   \left\{
+\begin{array}{ll}
+      e^y - y & y <= 0 \\
+      e^{-y} + y & 0 < y \\
+\end{array} 
+\right.  $$
+
+and 
+
+$E_2 = \frac{3}{2}$
+
+And then 
+$\text{SCRPS}(\text{lapl}(\mu, b),y) =\text{SCRPS}(\text{lapl}(0, 1),\frac{y-\mu}{b}) - \frac{1}{2} \log {b} $ 
+
+```{r}
+SCRPS_lapl <- function(y, mu = 0, b = 1){
+  y <- (y-mu)/b
+  if (y <= 0) {
+    E1 <- exp(y) -y
+  } else {
+    E1 <- exp(-y) +y 
+  }
+  E2 <- 3/2 
+  score <- -E1/E2 - 0.5*log(E2)
+  score <- score - 0.5*log(b)
+  return(score)
+}
+
+```
+
+
+
+
+
+
+
+
+# SCRPS for 2 piece normal distribution 
+
+Implementation using the following expression:   
+$\text{SCRPS}(\text{Exp}(\lambda,\text{location } a, \text{scale } b),y) = -\frac{E_1}{E_2} - \frac{1}{2}\log(E_2)$  
+
+where 
+
+$$ E_1 =   \left\{
+\begin{array}{ll}
+      a + \frac{b}{\lambda} - y & y <= a \\
+      \frac{b}{\lambda}(2e^{-\lambda (\frac{y-a}{b})} - 1) + y -a & a < y \\
+\end{array} 
+\right.  $$
+
+and 
+
+$E_2 = \frac{b}{\lambda}$
+
+```{r}
+SCRPS_2pnorm <- function(y, mu = 0, s1 = 1, s2 = 1){
+  erf <- function(x) 2 * pnorm(x * sqrt(2)) - 1  
+  erfc <- function(x) 2 * pnorm(x * sqrt(2), lower = FALSE)
+  y <- (y-mu)
+  if (y <= 0) {
+    E1 <- ( (-1 + 2*exp((-y^2)/(2*s1^2)))*sqrt(2/pi)*s1^2 + sqrt(2/pi)*s2^2 + y*s1 - y*s2 + 2*s1*y*erf(y/(sqrt(2)*s1))  ) /(s1 + s2) 
+  } else {
+    E1 <- (sqrt(2/pi)*s1^2 - sqrt(2/pi)*s2^2 + 2*exp(-y^2/(2*s2^2))*sqrt(2/pi)*s2^2 + s1*y + s2*y*erf(y/(sqrt(2)*s2)) -s2*y*erfc(y/sqrt(2)*s2)) / (s1 + s2) 
+  }
+  E2 <-  (-2*(-2 + sqrt(2))*s1^2 + 4*(-1 + sqrt(2))*s1*s2 -2*(-2 + sqrt(2))*s2^2) / (sqrt(pi)*(s1 + s2)) 
+  score <- -E1/E2 - 0.5*log(E2)
+  return(score)
+}
+
+```
+
+
+
+
+
+
+
+# SCRPS for lognormal distribution
+
+Implementation using the following expression:   
+$\text{SCRPS}(\text{lnorm}(\mu,\sigma ^2),y) = -\frac{E_1}{E_2} - \frac{1}{2}\log(E_2)$  
+
+where 
+
+$$ E_1 =   \left\{
+\begin{array}{ll}
+      a + \frac{b}{\lambda} - y & y <= a \\
+      \frac{b}{\lambda}(2e^{-\lambda (\frac{y-a}{b})} - 1) + y -a & a < y \\
+\end{array} 
+\right.  $$
+
+and 
+
+$E_2 = \frac{b}{\lambda}$
+
+```{r}
+SCRPS_lnorm <- function(y, meanlog = 0, sdlog = 1){
+  if (y <= 0) {
+    E1 <- exp(meanlog + (sdlog^2)/2) - y
+  } else {
+    E1 <- exp(meanlog + (sdlog^2)/2)*erf((meanlog + sdlog^2 - log(y))/(sqrt(2)*sdlog)) -y*erf((meanlog - log(y))/(sqrt(2)*sdlog))
+  }
+  E2 <- 1
+  score <- -E1/E2 - 0.5*log(E2)
+  return(score)
+}
+
+```
+
+
+
+
+test
+
+```{r} 
+erf <- function(x) 2 * pnorm(x * sqrt(2)) - 1 
+y <- 10 
+s <- 1.5
+mu <- 1
+n <- 1000000
+z <- exp(mu + (s^2)/2)
+E1 <- z*erf((mu + s^2 - log(y))/(sqrt(2)*s)) -y*erf((mu-log(y))/(sqrt(2)*s)) 
+sample1 <- rlnorm(n, meanlog = mu, sdlog = s)
+E2 <- mean(abs(sample1 - y))
+
+print(E1)
+print(E2)
+```
+
+
+
+
+
+
+
+
+
+
+
