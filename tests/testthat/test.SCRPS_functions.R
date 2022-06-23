@@ -18,7 +18,7 @@ test_that("SCRPS for normal distribution", {
     E2 <- mean(abs(sample1 - sample2))
     score2 <- -E1/E2 - 0.5*log(E2)
 
-    if (abs((score1 - score2)/(score1)) < 0.05) {
+    if (abs((score1 - score2)/(score1+10^-8)) < 0.05) {
       count <- count + 1
     }
 
@@ -52,7 +52,7 @@ test_that("SCRPS for exponential distribution", {
     y1 <- runif(1, min = -1000, max = 1000)
     l1 <- runif(1, min = 1, max = 10)
 
-    score1 <- SCRPS_exp(y1,l=l1)
+    score1 <- SCRPS_exp(y1,rate=l1)
     sample1 <- rexp(n,rate=l1)
     E1 <- mean(abs(sample1 - y1))
     sample1 <- rexp(n,rate=l1)
@@ -60,7 +60,7 @@ test_that("SCRPS for exponential distribution", {
     E2 <- mean(abs(sample1 - sample2))
     score2 <- -E1/E2 - 0.5*log(E2)
 
-    if (abs((score1 - score2)/(score1)) < 0.05) {
+    if (abs((score1 - score2)/(score1+10^-8)) < 0.05) {
       count <- count + 1
     }
 
@@ -96,7 +96,7 @@ test_that("SCRPS for uniform distribution", {
     E2 <- mean(abs(sample1 - sample2))
     score2 <- -E1/E2 - 0.5*log(E2)
 
-    if (abs((score1 - score2)/(score1)) < 0.05) {
+    if (abs((score1 - score2)/(score1+10^-8)) < 0.05) {
       count <- count + 1
     }
 
@@ -122,7 +122,7 @@ test_that("SCRPS for exponential distribution with flexible location and scale",
     a1 <- runif(1, min = -100, max = 100)
     b1 <- runif(1, min = 1, max = 50)
 
-    score1 <- SCRPS_exp2(y1,l=l1, a = a1, b = b1)
+    score1 <- SCRPS_exp2(y1,rate=l1, location = a1, scale = b1)
     sample1 <- rexp(n,rate=l1)
     sample1 <- a1 + b1*sample1
     E1 <- mean(abs(sample1 - y1))
@@ -134,7 +134,7 @@ test_that("SCRPS for exponential distribution with flexible location and scale",
     score2 <- -E1/E2 - 0.5*log(E2)
 
 
-    if (abs((score1 - score2)/(score1)) < 0.05) {
+    if (abs((score1 - score2)/(score1+10^-8)) < 0.05) {
       count <- count + 1
     }
 
@@ -163,7 +163,7 @@ test_that("SCRPS for logistic distribution", {
     m <- runif(1, min = -100, max = 100)
     s  <- runif(1, min = 1, max = 50)
 
-    score1 <- SCRPS_logis(y1,mu = m, sd = s)
+    score1 <- SCRPS_logis(y1,location = m, scale = s)
     sample1 <- rlogis(n,location = m, scale = s)
     E1 <- mean(abs(sample1 - y1))
     sample1 <- rlogis(n,location = m, scale = s)
@@ -171,7 +171,7 @@ test_that("SCRPS for logistic distribution", {
     E2 <- mean(abs(sample1 - sample2))
     score2 <- -E1/E2 - 0.5*log(E2)
 
-    if (abs((score1 - score2)/(score1)) < 0.05) {
+    if (abs((score1 - score2)/(score1+10^-8)) < 0.05) {
       count <- count + 1
     }
 
@@ -206,7 +206,7 @@ test_that("SCRPS for laplace distribution", {
     E2 <- mean(abs(sample1 - sample2))
     score2 <- -E1/E2 - 0.5*log(E2)
 
-    if (abs((score1 - score2)/(score1)) < 0.05) {
+    if (abs((score1 - score2)/(score1+10^-8)) < 0.05) {
       count <- count + 1
     }
 
@@ -225,7 +225,7 @@ test_that("SCRPS for laplace distribution", {
 
 
 
-test_that("SCRPS for 2 piece normal distribution", {
+test_that("SCRPS for two-piece normal distribution", {
 
   library("fanplot")
 
@@ -238,7 +238,7 @@ test_that("SCRPS for 2 piece normal distribution", {
     s1  <- runif(1, min = 1, max = 50)
     s2  <- runif(1, min = 1, max = 50)
 
-    score1 <- SCRPS_2pnorm(y1,mu = m, s1 = s1, s2 = s2)
+    score1 <- SCRPS_2pnorm(y1,mu = m, sd1 = s1, sd2 = s2)
     sample1 <- rsplitnorm(n, mode = m, sd1 = s1, sd2 = s2)
     E1 <- mean(abs(sample1 - y1))
     sample1 <- rsplitnorm(n, mode = m, sd1 = s1, sd2 = s2)
@@ -246,7 +246,7 @@ test_that("SCRPS for 2 piece normal distribution", {
     E2 <- mean(abs(sample1 - sample2))
     score2 <- -E1/E2 - 0.5*log(E2)
 
-    if (abs((score1 - score2)/(score1)) < 0.05) {
+    if (abs((score1 - score2)/(score1+10^-8)) < 0.05) {
       count <- count + 1
     }
 

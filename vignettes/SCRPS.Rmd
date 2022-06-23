@@ -226,20 +226,23 @@ SCRPS_lapl <- function(y, mu = 0, b = 1){
 # SCRPS for 2 piece normal distribution 
 
 Implementation using the following expression:   
-$\text{SCRPS}(\text{Exp}(\lambda,\text{location } a, \text{scale } b),y) = -\frac{E_1}{E_2} - \frac{1}{2}\log(E_2)$  
+$\text{SCRPS}(\text{2pnorm}(0, \sigma_1^2, \sigma_2^2),y) = -\frac{E_1}{E_2} - \frac{1}{2}\log(E_2)$  
 
 where 
 
 $$ E_1 =   \left\{
 \begin{array}{ll}
-      a + \frac{b}{\lambda} - y & y <= a \\
-      \frac{b}{\lambda}(2e^{-\lambda (\frac{y-a}{b})} - 1) + y -a & a < y \\
+      \frac{1}{\sigma_1 + \sigma_2} ((-1 + 2e^{\frac{-y^2}{2\sigma_1^2}})\sqrt{\frac{2} {\pi} }\sigma_1^2 + \sqrt{\frac{2}{\pi}}\sigma_2^2 + \sigma_1 y - \sigma_2 y + 2\sigma_1 y \text{ erf}(\frac{y}{\sqrt{2}\sigma_1})) & y <= 0 \\
+    \frac{1}{\sigma_1 + \sigma_2} ( \sqrt{\frac{2} {\pi} }\sigma_1^2 - \sqrt{\frac{2} {\pi} } \sigma_2^2 + 2e^{\frac{-y^2}{2\sigma_2^2}}\sqrt{\frac{2} {\pi} } \sigma_2^2 + \sigma_1 y + \sigma_2 y \text{ erf}(\frac{y}{\sqrt{2}\sigma_2}) - \sigma_2 y \text{ erfc}(\frac{y}{\sqrt{2}\sigma_2}))  & 0 < y \\
 \end{array} 
 \right.  $$
 
 and 
 
-$E_2 = \frac{b}{\lambda}$
+$E_2 = \frac{1}{\sqrt{\pi}(\sigma_1 + \sigma_2)}(-2(-2+\sqrt{2})\sigma_1^2 + 4(-1 + \sqrt{2})\sigma_1\sigma_2 -2(-2+\sqrt{2})\sigma_2^2)$
+
+and then 
+$\text{SCRPS}(\text{2pnorm}(\mu, \sigma_1^2, \sigma_2^2),y) = text{SCRPS}(\text{2pnorm}(0, \sigma_1^2, \sigma_2^2),y-\mu)$
 
 ```{r}
 SCRPS_2pnorm <- function(y, mu = 0, s1 = 1, s2 = 1){
