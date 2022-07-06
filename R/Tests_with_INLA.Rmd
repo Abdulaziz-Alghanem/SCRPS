@@ -1,0 +1,215 @@
+```{r}
+library(INLA)
+library(MASS)
+
+
+data(cement)
+source("SCRPS.R")
+
+
+
+
+result <- inla(y ~ x1 + x2 + x3 + x4, data = cement, control.compute=list(return.marginals.predictor=TRUE))
+summary(result)
+
+
+########################3
+MC_test <- function(inla_result, n = 10000) {
+  
+   # score <- inla_result$.args$data$y
+  score <- numeric(13)
+  for (i in 1:nrow(inla_result$summary.fitted.values)) {
+    temp <- numeric(10)
+    for (j in 1:10) {
+       mu_sample1 <- inla.rmarginal(n, inla_result$marginals.fitted.values[[i]]) 
+    mu_sample2 <- inla.rmarginal(n, inla_result$marginals.fitted.values[[i]]) 
+    #mu_sample3 <- inla.rmarginal(n, inla_result$marginals.fitted.values[[i]]) 
+    theta_sample1 <- inla.rmarginal(n,inla_result$marginals.hyperpar[[1]])
+    theta_sample2 <- inla.rmarginal(n,inla_result$marginals.hyperpar[[1]])
+    #theta_sample3 <- inla.rmarginal(n,inla_result$marginals.hyperpar[[1]])
+    #y_sample1 <- rnorm(n, mean = 1, sd = 10)
+    #y_sample2 <- rnorm(n, mean = 1, sd = 10)
+    y_sample1 <- rnorm(n, mean = mu_sample1, sd = 1/sqrt(theta_sample1))
+    y_sample2 <- rnorm(n, mean = mu_sample2, sd = 1/sqrt(theta_sample2))
+    #y_sample3 <- rnorm(n, mean = mu_sample3, sd = 1/sqrt(theta_sample3))
+    y <- inla_result$.args$data$y[i]
+    E1 <- mean(abs(y_sample1-y))
+    E2 <- mean(abs(y_sample1-y_sample2))
+    temp[j] <- -E1/E2 - 0.5*log(E2)
+    }
+   
+    score[i] = mean(temp)
+    
+  }
+  
+ print(score)
+  return(list(mean_score = mean(score), scores=score))
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+}
+
+
+
+#MC_test(result)
+
+
+
+###################################################3
+
+
+analytic_test <- function(inla_result, n = 1000000) {
+  
+  
+  score <- inla_result$.args$data$y
+  for (i in 1:nrow(inla_result$summary.fitted.values)) {
+    
+    mu_sample <- inla.rmarginal(n, inla_result$marginals.fitted.values[[i]]) 
+    theta_sample <- inla.rmarginal(n,inla_result$marginals.hyperpar[[1]])
+    y <- inla_result$.args$data$y[i]
+    #temp <- SCRPS_norm(y, mean = 1, sd = 10)
+    temp <- SCRPS_norm(y, mean = mu_sample, sd = 1/sqrt(theta_sample))
+    #temp <- SCRPS_norm(y, mean = mu_sample, sd = 1/sqrt(inla_result$summary.hyperpar$mean))
+    score[i] = mean(temp)
+    
+  }
+  
+ print(score)
+  return(mean(score))
+  
+  
+}
+
+
+analytic_test(result)
+
+
+
+
+
+numeric_Int_test <- function(inla_result) {
+#   
+  score <- inla_result$.args$data$y
+
+
+   for (i in 1:nrow(inla_result$summary.fitted.values)) {
+
+    min_mu <- inla_result$marginals.fitted.values[[i]][1,"x"]
+    max_mu <- inla_result$marginals.fitted.values[[i]][nrow(inla_result$marginals.fitted.values[[i]]),"x"]
+
+    mu_dens <- function(x){
+    dens <- sapply(x, function(z){
+      if(z<min_mu){
+        return(0)
+      } else if (z>max_mu){
+        return(0)
+      } else{
+        return(approx(x=inla_result$marginals.fitted.values[[i]][,"x"], y=inla_result$marginals.fitted.values[[i]][,"y"], xout=z)$y)
+
+      }
+    })
+    return(dens)
+  }
+
+
+    min_theta <- inla_result$marginals.hyperpar[[1]][1,"x"]
+    max_theta <- inla_result$marginals.hyperpar[[1]][nrow(inla_result$marginals.hyperpar[[1]]),"x"]
+
+    theta_dens <- function(x){
+    dens <- sapply(x, function(z){
+      if(z<min_theta){
+        return(0)
+      } else if (z>max_theta){
+        return(0)
+      } else{
+        return(approx(inla_result$marginals.hyperpar[[1]][,"x"], inla_result$marginals.hyperpar[[1]][,"y"], z)$y)
+
+      }
+    })
+    return(dens)
+  }
+
+
+    temp_func <- function(mu, theta) {
+
+      return(SCRPS_norm(inla_result$.args$data$y[i], mean = mu, sd = 1/sqrt(theta))*mu_dens(mu)*theta_dens(theta))
+
+
+    }
+  
+
+  
+  
+      
+    #theta_grid <- seq(from = min_theta, to = max_theta, by = Step_size)
+    theta_grid <- inla_result$marginals.hyperpar[[1]][,"x"]
+    
+    Integral1 = numeric(length=length(theta_grid))
+
+    for(j in 1:length(theta_grid)){
+          Integral1[j] <- integrate(f = temp_func, lower = min_mu, upper = max_mu, theta=theta_grid[j])[[1]]
+    }
+    
+    
+    temp_func2 <- function(x){
+    dens <- sapply(x, function(z){
+      if(z<theta_grid[1]){
+        return(0)
+      } else if (z>theta_grid[length(theta_grid)]){
+        return(0)
+      } else{
+        return(approx(x=theta_grid, y=Integral1, xout=z)$y)
+
+      }
+    })
+    return(dens)
+  }
+
+
+    
+        Integral2 = integrate(f = temp_func2, lower = min_theta, upper = max_theta)[[1]]
+    score[i]  = Integral2
+  }
+
+
+
+
+  print(score)
+
+  return(mean(score))
+
+
+
+
+
+
+}
+
+#numeric_Int_test(result)
+
+
+
+
+
+
+
+
+
+
+``` 
+
+
+
+
+
+
+
+
+

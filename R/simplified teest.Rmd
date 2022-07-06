@@ -1,0 +1,192 @@
+```{r}
+library(INLA)
+library(MASS)
+source("SCRPS.R")
+
+data(cement)
+
+samplesize = 1000
+
+x1 = rexp(samplesize)
+x2 = runif(samplesize)
+y = 1 + x1 + x2 + rnorm(samplesize)
+
+df = data.frame(y=y,x1=x1,x2=x2)
+
+# result <- inla(y ~ x1 + x2 + x3 + x4, data = cement, control.compute=list(return.marginals.predictor=TRUE))
+
+result <- inla(y ~ x1 + x2, data = df, control.compute=list(return.marginals.predictor=TRUE))
+summary(result)
+
+
+########################
+MC_test <- function(inla_result, n = 1000) {
+  
+   score <- inla_result$.args$data$y
+  
+  for (i in 1:nrow(inla_result$summary.fitted.values)) {
+    temp <- numeric(100)
+    for (j in 1:100) {
+    mu_sample1 <- inla.rmarginal(n, inla_result$marginals.fitted.values[[i]]) 
+    mu_sample2 <- inla.rmarginal(n, inla_result$marginals.fitted.values[[i]]) 
+    theta_sample1 <- inla.rmarginal(n,inla_result$marginals.hyperpar[[1]])
+    theta_sample2 <- inla.rmarginal(n,inla_result$marginals.hyperpar[[1]])
+    y_sample1 <- rnorm(n, mean = mu_sample1, sd = 1/sqrt(theta_sample1))
+    y_sample2 <- rnorm(n, mean = mu_sample2, sd = 1/sqrt(theta_sample2))
+    y <- inla_result$.args$data$y[i]
+    E1 <- mean(abs(y_sample1-y))
+    E2 <- mean(abs(y_sample1-y_sample2))
+    temp[j] <- -E1/E2 - 0.5*log(E2)
+    }
+   
+    score[i] = mean(temp)
+    
+  }
+  
+ print(score)
+  return(list(mean_score = mean(score), scores=score))
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+}
+
+
+
+MC_test(result)
+
+
+
+
+
+
+
+
+
+
+MC_test2 <- function(inla_result, n = 10000) {
+  
+  score <- numeric(nrow(inla_result$summary.fitted.values))
+  
+  for (i in 1:nrow(inla_result$summary.fitted.values) ) {
+    
+    sample_1 <- inla.rmarginal(n, inla_result$marginals.fitted.values[[i]])
+    sample_2 <- inla.rmarginal(n, inla_result$marginals.fitted.values[[i]])
+    # y1 <- rnorm(n, mean = sample_1, sd = 1/sqrt(sample_3))
+    # y2 <- rnorm(n, mean = sample_2, sd = 1/sqrt(sample_4))
+     y1 <- rnorm(n, mean = inla_result$summary.fitted.values$mean[i], sd = 0.00001)
+    y2 <- rnorm(n, mean = inla_result$summary.fitted.values$mean[i], sd = 0.00001)
+    y3 <- inla_result$.args$data$y[i]
+    E1 <- mean(abs(y1 - y3))
+    E2 <- mean(abs(y1 - y2))
+    score[i] <- - E1/E2 - 0.5*log(E2)
+    
+  }
+  
+  return(mean(score))
+  
+}
+
+
+
+MC_test2(result)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+####################
+
+numeric_Int_test <- function(inla_result) {
+#   
+  score <- inla_result$.args$data$y
+
+
+   for (i in 1:nrow(inla_result$summary.fitted.values)) {
+
+    min_mu <- inla_result$marginals.fitted.values[[i]][1,"x"]
+    max_mu <- inla_result$marginals.fitted.values[[i]][nrow(inla_result$marginals.fitted.values[[i]]),"x"]
+
+    mu_dens <- function(x){
+    dens <- sapply(x, function(z){
+      if(z<min_mu){
+        return(0)
+      } else if (z>max_mu){
+        return(0)
+      } else{
+        return(spline(x=inla_result$marginals.fitted.values[[i]][,"x"], y=inla_result$marginals.fitted.values[[i]][,"y"], xout=z)$y)
+
+      }
+    })
+    return(dens)
+  }
+
+
+
+
+    temp_func <- function(mu) {
+
+      return(SCRPS_norm(inla_result$.args$data$y[i], mean = mu, sd = 0.00001)*mu_dens(mu))
+
+
+    }
+        Integral2 = integrate(f = temp_func, lower = min_mu, upper = max_mu)[[1]]
+    score[i]  = Integral2
+  }
+
+
+
+
+  print(score)
+
+  return(mean(score))
+
+
+
+
+
+
+}
+
+numeric_Int_test(result)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+``` 

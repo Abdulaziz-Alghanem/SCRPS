@@ -322,10 +322,81 @@ print(E2)
 
 
 
+# SCRPS for gamma distribution 
+
+Implementation using the following expression:   
+$\text{SCRPS}(\text{lapl}(0, 1),y) = -\frac{E_1}{E_2} - \frac{1}{2}\log(E_2)$  
+
+where 
+
+$$ E_1 =   \left\{
+\begin{array}{ll}
+      e^y - y & y <= 0 \\
+      e^{-y} + y & 0 < y \\
+\end{array} 
+\right.  $$
+
+and 
+
+$E_2 = \frac{3}{2}$
+
+And then 
+$\text{SCRPS}(\text{lapl}(\mu, b),y) =\text{SCRPS}(\text{lapl}(0, 1),\frac{y-\mu}{b}) - \frac{1}{2} \log {b} $ 
+
+```{r}
+
+SCRPS_gamma <- function(y, shape = 1, scale = 1){
+  gammainc <- function(a, x) {
+    
+    return(gamma(a) *(1- pgamma(x,shape = a, scale = 1)))
+    
+  }
+  
+  if (y <= 0) {
+    E1 <- -y + shape*scale
+  } else {
+    E1 <-  (y*gamma(shape) - shape*scale*gamma(shape) - 2*y*gammainc(shape,y/scale) + 2*scale*gammainc(1+shape,y/scale))/gamma(shape)
+  }
+  crps <- y*(2*pgamma(y, shape = shape, scale = scale) - 1) - shape*b*(2*pgamma(y,shape = shape+1,scale = scale)-1)- scale/(beta(0.5,shape))
+  E2 <- (crps - E1)*-2
+  score <- -E1/E2 - 0.5*log(E2)
+  return(score)
+}
+
+```
 
 
 
+test 
+``` {r}
+  n <- 100000
+  k <- 50
+  count <- 0
+  for (i in 1:k) {
+    y1 <- runif(1, min = -1000, max = 1000)
+    a <- runif(1, min = 1, max = 20)
+    b <- runif(1, min = 1, max = 20)
+    score1 <- SCRPS_gamma(y1,shape=a, scale = b)
+    sample1 <- rgamma(n,shape= a, scale = b)
+    E1 <- mean(abs(sample1 - y1))
+    sample1 <- rgamma(n,shape= a, scale = b)
+    sample2 <- rgamma(n,shape= a, scale = b)
+    E2 <- mean(abs(sample1 - sample2))
+    score2 <- -E1/E2 - 0.5*log(E2)
+
+    if (abs((score1 - score2)/(score1+10^-8)) < 0.05) {
+      count <- count + 1
+    }
+
+  }
 
 
+
+  accuracy = count/k
+
+  print(accuracy)
+
+
+```
 
 
