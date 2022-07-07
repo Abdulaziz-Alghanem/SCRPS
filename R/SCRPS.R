@@ -176,3 +176,21 @@ SCRPS_2pnorm <- function(y, mu = 0, sd1 = 1, sd2 = 1){
 
 
 
+
+SCRPS_gamma <- function(y, shape = 1, scale = 1){
+  gammainc <- function(a, x) {
+
+    return(gamma(a) *(1- pgamma(x,shape = a, scale = 1)))
+
+  }
+  ifelse(y <= 0, E1 <- -y + shape*scale,  E1 <-  (y*gamma(shape) - shape*scale*gamma(shape) - 2*y*gammainc(shape,y/scale) + 2*scale*gammainc(1+shape,y/scale))/gamma(shape))
+
+  temp <- y*(2*pgamma(y, shape = shape, scale = scale) - 1) - shape*b*(2*pgamma(y,shape = shape+1,scale = scale)-1)- scale/(beta(0.5,shape))
+  E2 <- (temp - E1)*-2
+  score <- -E1/E2 - 0.5*log(E2)
+  return(score)
+}
+
+
+
+
