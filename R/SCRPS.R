@@ -1,6 +1,8 @@
 
 
-#'SCRPS for the normal distribution
+#'@name SCRPS_norm
+#'
+#'@title SCRPS for the normal distribution
 #'
 #'@description
 #'Calculates the SCRPS for observations \code{y} and normal distributions with means = \code{mean} and standard deviatoins = \code{sd}.
@@ -16,14 +18,15 @@
 #' SCRPS_norm(0,mean = 0, sd = 1)
 SCRPS_norm <- function(y, mean = 0, sd = 1) {
   z <- (mean-y) /sd
-  score <- -sqrt(pi)*dnorm(z) - sqrt(pi)*z/2 * (2*pnorm(z) - 1) - 0.5*log(2*sd/sqrt(pi))
+  score <- -sqrt(pi)*stats::dnorm(z) - sqrt(pi)*z/2 * (2*stats::pnorm(z) - 1) - 0.5*log(2*sd/sqrt(pi))
 
   return(score)
 }
 
 
-
-#' SCRPS for the exponential distribution
+#'@name SCRPS_exp
+#'
+#'@title SCRPS for the exponential distribution
 #'
 #'@description
 #'Calculates the SCRPS for observations \code{y} and exponential distributions with rates = \code{rate}.
@@ -45,8 +48,9 @@ SCRPS_exp <- function(y, rate = 1){
 
 
 
-
-#' SCRPS for the uniform distribution
+#'@name SCRPS_unif
+#'
+#'@title SCRPS for the uniform distribution
 #'
 #'@description
 #'Calculates the SCRPS for observations \code{y} and uniform distributions with lower limits = \code{min} and upper limits = \code{max}.
@@ -159,8 +163,8 @@ SCRPS_lapl <- function(y, mu = 0, b = 1){
 #' @examples
 #' SCRPS_2pnorm(7, 6, 2, 3)
 SCRPS_2pnorm <- function(y, mu = 0, sd1 = 1, sd2 = 1){
-  erf <- function(x) 2 * pnorm(x * sqrt(2)) - 1
-  erfc <- function(x) 2 * pnorm(x * sqrt(2), lower = FALSE)
+  erf <- function(x) 2 * stats::pnorm(x * sqrt(2)) - 1
+  erfc <- function(x) 2 * stats::pnorm(x * sqrt(2), lower = FALSE)
   y <- (y-mu)
   ifelse(y <= 0,
          E1 <- ( (-1 + 2*exp((-y^2)/(2*sd1^2)))*sqrt(2/pi)*sd1^2 + sqrt(2/pi)*sd2^2 + y*sd1 - y*sd2 + 2*sd1*y*erf(y/(sqrt(2)*sd1))  ) /(sd1 + sd2),
@@ -176,16 +180,32 @@ SCRPS_2pnorm <- function(y, mu = 0, sd1 = 1, sd2 = 1){
 
 
 
+#' SCRPS for Gamma distribution
+#'
+#' @description
+#'  Calculates the SCRPS for observations \code{y} and
+#'
+#' @param y bla
+#' @param shape bla
+#' @param rate bla
+#' @param scale bla
+#'
+#' @return bla
+#' @export
+#'
+#'
+#' @examples
+#' #' SCRPS_gamma(7, 6, 2, 3)
 
-SCRPS_gamma <- function(y, shape = 1, scale = 1){
+SCRPS_gamma <- function(y, shape = 1, rate = 1, scale = 1/rate){
   gammainc <- function(a, x) {
 
-    return(gamma(a) *(1- pgamma(x,shape = a, scale = 1)))
+    return(gamma(a) *(1- stats::pgamma(x,shape = a, scale = 1)))
 
   }
   ifelse(y <= 0, E1 <- -y + shape*scale,  E1 <-  (y*gamma(shape) - shape*scale*gamma(shape) - 2*y*gammainc(shape,y/scale) + 2*scale*gammainc(1+shape,y/scale))/gamma(shape))
 
-  temp <- y*(2*pgamma(y, shape = shape, scale = scale) - 1) - shape*b*(2*pgamma(y,shape = shape+1,scale = scale)-1)- scale/(beta(0.5,shape))
+  temp <- y*(2*stats::pgamma(y, shape = shape, scale = scale) - 1) - shape*scale*(2*stats::pgamma(y,shape = shape+1,scale = scale)-1)- scale/(beta(0.5,shape))
   E2 <- (temp - E1)*-2
   score <- -E1/E2 - 0.5*log(E2)
   return(score)
