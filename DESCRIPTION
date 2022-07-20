@@ -9,7 +9,7 @@ Description: More about what it does (maybe more than one line)
 License: GPL-3
 Encoding: UTF-8
 Imports:
-    foreach
+    foreach, doParallel
 Suggests: 
     testthat (>= 3.0.0), INLA, ExtDist, fanplot
 Config/testthat/edition: 3
