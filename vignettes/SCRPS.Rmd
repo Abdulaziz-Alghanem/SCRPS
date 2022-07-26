@@ -267,57 +267,6 @@ SCRPS_2pnorm <- function(y, mu = 0, s1 = 1, s2 = 1){
 
 
 
-# SCRPS for lognormal distribution
-
-Implementation using the following expression:   
-$\text{SCRPS}(\text{lnorm}(\mu,\sigma ^2),y) = -\frac{E_1}{E_2} - \frac{1}{2}\log(E_2)$  
-
-where 
-
-$$ E_1 =   \left\{
-\begin{array}{ll}
-      a + \frac{b}{\lambda} - y & y <= a \\
-      \frac{b}{\lambda}(2e^{-\lambda (\frac{y-a}{b})} - 1) + y -a & a < y \\
-\end{array} 
-\right.  $$
-
-and 
-
-$E_2 = \frac{b}{\lambda}$
-
-```{r}
-SCRPS_lnorm <- function(y, meanlog = 0, sdlog = 1){
-  if (y <= 0) {
-    E1 <- exp(meanlog + (sdlog^2)/2) - y
-  } else {
-    E1 <- exp(meanlog + (sdlog^2)/2)*erf((meanlog + sdlog^2 - log(y))/(sqrt(2)*sdlog)) -y*erf((meanlog - log(y))/(sqrt(2)*sdlog))
-  }
-  E2 <- 1
-  score <- -E1/E2 - 0.5*log(E2)
-  return(score)
-}
-
-```
-
-
-
-
-test
-
-```{r} 
-erf <- function(x) 2 * pnorm(x * sqrt(2)) - 1 
-y <- 10 
-s <- 1.5
-mu <- 1
-n <- 1000000
-z <- exp(mu + (s^2)/2)
-E1 <- z*erf((mu + s^2 - log(y))/(sqrt(2)*s)) -y*erf((mu-log(y))/(sqrt(2)*s)) 
-sample1 <- rlnorm(n, meanlog = mu, sdlog = s)
-E2 <- mean(abs(sample1 - y))
-
-print(E1)
-print(E2)
-```
 
 
 
@@ -325,78 +274,99 @@ print(E2)
 # SCRPS for gamma distribution 
 
 Implementation using the following expression:   
-$\text{SCRPS}(\text{lapl}(0, 1),y) = -\frac{E_1}{E_2} - \frac{1}{2}\log(E_2)$  
+$\text{SCRPS}(\Gamma(k, \theta),y) = -\frac{E_1}{E_2} - \frac{1}{2}\log(E_2)$  
 
 where 
 
-$$ E_1 =   \left\{
-\begin{array}{ll}
-      e^y - y & y <= 0 \\
-      e^{-y} + y & 0 < y \\
-\end{array} 
-\right.  $$
+$$ E_1 =2yF_{k, \theta}(y) -y -2k\theta F_{k + 1, \theta}(y) +k\theta$$
 
 and 
 
-$E_2 = \frac{3}{2}$
+$$E_2 = \frac{2\theta}{B\left(\frac{1}{2}, k\right)}$$
+
+where $F_{k, \theta}$ is the cumulative distribution function for a gamma distribution with shape parameter k and scale parameter $\theta$, and $B(x,y)$ is the beta function.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# SCRPS for student's t distribution 
+Implementation using the following expression:   
+$\text{SCRPS}(\text{t}(\nu),y) = -\frac{E_1}{E_2} - \frac{1}{2}\log(E_2)$  
+
+where 
+
+$$ E_1 =   y(2F_\nu(y) - 1) + 2f_\nu\left(\frac{\nu + y^2}{\nu -1}\right)$$
+
+and 
+
+$$E_2 = \frac{4\sqrt{\nu}}{\nu-1} \frac{B(\frac{1}{2}, \nu - \frac{1}{2})}{B(\frac{1}{2}, \frac{\nu}{2})^2}$$
 
 And then 
-$\text{SCRPS}(\text{lapl}(\mu, b),y) =\text{SCRPS}(\text{lapl}(0, 1),\frac{y-\mu}{b}) - \frac{1}{2} \log {b} $ 
+$\text{SCRPS}(\text{t}(\nu, \mu, \sigma),y) =\text{SCRPS}(\text{t}(\nu),\frac{y-\mu}{\sigma}) - \frac{1}{2} \log {\sigma}$ 
 
-```{r}
-
-SCRPS_gamma <- function(y, shape = 1, scale = 1){
-  gammainc <- function(a, x) {
-    
-    return(gamma(a) *(1- pgamma(x,shape = a, scale = 1)))
-    
-  }
-  
-  if (y <= 0) {
-    E1 <- -y + shape*scale
-  } else {
-    E1 <-  (y*gamma(shape) - shape*scale*gamma(shape) - 2*y*gammainc(shape,y/scale) + 2*scale*gammainc(1+shape,y/scale))/gamma(shape)
-  }
-  crps <- y*(2*pgamma(y, shape = shape, scale = scale) - 1) - shape*b*(2*pgamma(y,shape = shape+1,scale = scale)-1)- scale/(beta(0.5,shape))
-  E2 <- (crps - E1)*-2
-  score <- -E1/E2 - 0.5*log(E2)
-  return(score)
-}
-
-```
+where 
+$f_\nu$ and $F_\nu$ are, respectively,  the  density function and the cumulative distribution function of a Student's t distribution with degrees of freedom parameter $\nu > 1$, and $B(x,y)$ is the beta function.
 
 
 
-test 
-``` {r}
-  n <- 100000
-  k <- 50
-  count <- 0
-  for (i in 1:k) {
-    y1 <- runif(1, min = -1000, max = 1000)
-    a <- runif(1, min = 1, max = 20)
-    b <- runif(1, min = 1, max = 20)
-    score1 <- SCRPS_gamma(y1,shape=a, scale = b)
-    sample1 <- rgamma(n,shape= a, scale = b)
-    E1 <- mean(abs(sample1 - y1))
-    sample1 <- rgamma(n,shape= a, scale = b)
-    sample2 <- rgamma(n,shape= a, scale = b)
-    E2 <- mean(abs(sample1 - sample2))
-    score2 <- -E1/E2 - 0.5*log(E2)
-
-    if (abs((score1 - score2)/(score1+10^-8)) < 0.05) {
-      count <- count + 1
-    }
-
-  }
 
 
 
-  accuracy = count/k
-
-  print(accuracy)
 
 
-```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# SCRPS for lognormal distribution
+
+Implementation using the following expression:   
+$\text{SCRPS}(\text{lnorm}(\mu,\sigma ^2),y) = -\frac{E_1}{E_2} - \frac{1}{2}\log(E_2)$  
+
+where 
+$$ E_1 = y(2F_{\mu,\sigma}(y)-1) -2e^\left(\mu + \frac{\sigma^2}{2} \right)\left(z-\frac{1}{2}\right) $$
+
+and 
+
+$$E_2 = 4e^\left(\mu + \frac{\sigma^2}{2} \right)\left(\Phi\left( \frac{\sigma}{\sqrt{2}} \right)-\frac{1}{2}\right)$$
+with 
+$$ z =   \left\{
+\begin{array}{ll}
+      0 & y <= 0 \\
+      \Phi\left(\frac{\log{y}-\mu - \sigma^2}{\sigma}   \right) & 0 < y \\
+\end{array} 
+\right.  $$
+
+
+
+and $F_{\mu, \sigma}$ is the cumulative distribution function for the lognormal distribution with locationlog parameter $\mu$ and scalelog parameter $\sigma$, and $\Phi$ is the cumulative distribution function for the standard normal distribution. 
+
+
+
 
 

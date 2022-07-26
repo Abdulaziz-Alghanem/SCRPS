@@ -183,14 +183,14 @@ SCRPS_2pnorm <- function(y, mu = 0, sd1 = 1, sd2 = 1){
 #' SCRPS for Gamma distribution
 #'
 #' @description
-#'  Calculates the SCRPS for observations \code{y} and
+#'  Calculates the SCRPS for observations \code{y} and gamma distribution with shape parameter \code{shape} and scale parameter \code{scale} or alternatively rate parameter \code{rate} = 1/\code{scale}.
 #'
-#' @param y bla
-#' @param shape bla
-#' @param rate bla
-#' @param scale bla
+#' @param y Vector of observations.
+#' @param shape Vector of shape parameters. Must be positive.
+#' @param rate An alternative way to specify the scale.
+#' @param scale Vector of scale parameters. Must be positive.
 #'
-#' @return bla
+#' @return Vector of scores.
 #' @export
 #'
 #'
@@ -198,19 +198,124 @@ SCRPS_2pnorm <- function(y, mu = 0, sd1 = 1, sd2 = 1){
 #' #' SCRPS_gamma(7, 6, 2, 3)
 
 SCRPS_gamma <- function(y, shape = 1, rate = 1, scale = 1/rate){
-  gammainc <- function(a, x) {
-
-    return(gamma(a) *(1- stats::pgamma(x,shape = a, scale = 1)))
-
-  }
-  ifelse(y <= 0, E1 <- -y + shape*scale,  E1 <-  (y*gamma(shape) - shape*scale*gamma(shape) - 2*y*gammainc(shape,y/scale) + 2*scale*gammainc(1+shape,y/scale))/gamma(shape))
-
-  temp <- y*(2*stats::pgamma(y, shape = shape, scale = scale) - 1) - shape*scale*(2*stats::pgamma(y,shape = shape+1,scale = scale)-1)- scale/(beta(0.5,shape))
-  E2 <- (temp - E1)*-2
+  E1 <- 2*y*stats::pgamma(y,shape = shape, scale = scale) - y - 2*shape*scale*stats::pgamma(y, shape = shape+1, scale = scale) + shape*scale
+  E2 <- 2*scale/beta(1/2, shape)
   score <- -E1/E2 - 0.5*log(E2)
   return(score)
 }
 
 
+
+
+
+
+
+
+
+
+#' SCRPS for Student's t distribution
+#'
+#'@description
+#'  Calculates the SCRPS for observations \code{y} and Student's t distribution with degrees of freedom parameter \code{df} and optionally location parameter \code{location} and scale parameter \code{scale}.
+#'
+#' @param y Vector of observations.
+#' @param df Vector of degrees of freedom parameters. Must be greater than 1.
+#' @param location Vector of location parameters.
+#' @param scale Vector of scale parameters. Must be positive.
+#'
+#' @return Vector of scores.
+#' @export
+#'
+#' @examples
+#' SCRPS_t(1,2,3,4)
+#'
+SCRPS_t <- function(y, df, location = 0, scale = 1) {
+  y <- (y - location)/scale
+
+  E1 <- y*(2*stats::pt(y,df = df) - 1) + 2*stats::dt(y, df =df)*(df + y^2)/(df - 1)
+  E2 <- (4*sqrt(df))*(beta(1/2, df- 1/2))/(df-1)/(beta(1/2, df/2))^2
+  score <- -E1/E2 - 0.5*log(E2)
+  score <- score - 0.5 * log(scale)
+  return(score)
+}
+
+
+
+
+
+
+
+
+
+
+#' SCRPS for log-normal distribution
+#'
+#'@description
+#'  Calculates the SCRPS for observations \code{y} and lognormal distribution with locationlog parameter \code{meanlog} and scalelog parameter \code{sdlog}.
+#'
+#' @param y Vector of observations.
+#' @param meanlog Vector of locationlog parameters.
+#' @param sdlog Vector of scalelog parameters. Must be positive.
+#'
+#' @return Vector of scores.
+#' @export
+#'
+#' @examples
+#' SCRPS_lnorm(1,2,3)
+SCRPS_lnorm <- function(y, meanlog = 0, sdlog = 1){
+  ifelse(y <= 0, temp <- 0,  temp <- stats::pnorm((log(y) - meanlog - sdlog^2)/sdlog))
+  E1 <- y*(2*stats::plnorm(y,meanlog = meanlog, sdlog = sdlog) - 1) -2*exp(meanlog + (sdlog^2)/2)*(temp-0.5)
+  E2 <- 4*exp(meanlog + (sdlog^2)/2)*(stats::pnorm(sdlog/sqrt(2))-0.5)
+  score <- -E1/E2 - 0.5*log(E2)
+  return(score)
+}
+
+
+
+
+
+
+
+
+
+#'
+#'
+#'
+#' #' SCRPS for log-laplace distribution
+#' #'
+#' #'@description
+#' #'  Calculates the SCRPS for observations \code{y} and loglaplace distribution with locationlog parameter \code{locationlog} and scalelog parameter \code{scalelog}.
+#' #'
+#' #' @param y Vector of observations.
+#' #' @param locationlog Vector of locationlog parameters.
+#' #' @param scalelog Vector of scalelog parameters. Must be between 0 and 1
+#' #'
+#' #' @return Vector of scores.
+#' #' @export
+#' #'
+#' #' @examples
+#' #' SCRPS_llapl(1,2,0.7)
+#' SCRPS_llapl <- function(y, locationlog = 0, scalelog = 0.5){
+#'
+#'   FF <- function(x, locationlog, scalelog ) {
+#'     ifelse(x <= 0,0,0.5*(1 + sign(log(x)- locationlog)*(1-exp(-abs(log(x)- locationlog)/scalelog))))
+#'
+#'   }
+#'
+#'   A <- function(x, locationlog, scalelog) {
+#'
+#'     ifelse(x < exp(locationlog), (1-(2*FF(x,locationlog,scalelog))^(1+scalelog))/(1+scalelog) , (1- (2*(1- FF(x,locationlog,scalelog)))^(1-scalelog))/(scalelog - 1) )
+#'
+#'
+#'
+#'   }
+#'
+#'
+#'   E1 <- y*(2*FF(y,locationlog,scalelog) - 1) + exp(locationlog)*(A(y,  locationlog, scalelog))
+#'   E2 <-  0.25*exp(locationlog)*((scalelog/(scalelog^2-4)))
+#'   score <- -E1/E2 - 0.5*log(E2)
+#'   return(score)
+#' }
+#'
 
 

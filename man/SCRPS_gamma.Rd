@@ -7,19 +7,19 @@
 SCRPS_gamma(y, shape = 1, rate = 1, scale = 1/rate)
 }
 \arguments{
-\item{y}{bla}
+\item{y}{Vector of observations.}
 
-\item{shape}{bla}
+\item{shape}{Vector of shape parameters. Must be positive.}
 
-\item{rate}{bla}
+\item{rate}{An alternative way to specify the scale.}
 
-\item{scale}{bla}
+\item{scale}{Vector of scale parameters. Must be positive.}
 }
 \value{
-bla
+Vector of scores.
 }
 \description{
-Calculates the SCRPS for observations \code{y} and
+Calculates the SCRPS for observations \code{y} and gamma distribution with shape parameter \code{shape} and scale parameter \code{scale} or alternatively rate parameter \code{rate} = 1/\code{scale}.
 }
 \examples{
 #' SCRPS_gamma(7, 6, 2, 3)

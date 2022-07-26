@@ -11,6 +11,6 @@ Encoding: UTF-8
 Imports:
     foreach, doParallel
 Suggests: 
-    testthat (>= 3.0.0), INLA, ExtDist, fanplot
+    testthat (>= 3.0.0), INLA, ExtDist, fanplot, ggdist, VGAM
 Config/testthat/edition: 3
 RoxygenNote: 7.2.0

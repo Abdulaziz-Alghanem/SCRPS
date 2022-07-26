@@ -139,7 +139,14 @@ SCRPS_inla_gamma <- function(inla_result, n = 10000,
     }
   }
 
-  s <- rep(inla_result$.args$scale, length.out = nrow(inla_result$summary.fitted.values))
+  s_full <- inla_result$.args$scale
+  if(length(s_full)==1){
+    s <- rep(s_full, length.out = nrow(inla_result$summary.fitted.values))
+  } else{
+    s <- s_full
+    rm(s_full)
+  }
+
 
 
   if(parallelize){

@@ -268,3 +268,213 @@ test_that("SCRPS for two-piece normal distribution", {
 
 
 
+
+
+test_that("SCRPS for gamma distribution", {
+
+
+
+  n <- 100000
+  k <- 50
+  count <- 0
+  for (i in 1:k) {
+    y1 <- runif(1, min = -1000, max = 1000)
+    a <- runif(1, min = 1, max = 20)
+    b <- runif(1, min = 1, max = 20)
+
+    score1 <- SCRPS_gamma(y1,shape=a, scale = b)
+    sample1 <- rgamma(n,shape= a, scale = b)
+    E1 <- mean(abs(sample1 - y1))
+    sample1 <- rgamma(n,shape= a, scale = b)
+    sample2 <- rgamma(n,shape= a, scale = b)
+    E2 <- mean(abs(sample1 - sample2))
+    score2 <- -E1/E2 - 0.5*log(E2)
+
+    if (abs((score1 - score2)/(score1+10^-8)) < 0.05) {
+      count <- count + 1
+    }
+
+  }
+
+
+
+
+
+  accuracy = count/k
+
+  expect_gt(accuracy, 0.95)
+
+
+} )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+test_that("SCRPS for Student's t distribution", {
+
+  library("ggdist")
+
+  n <- 100000
+  k <- 50
+  count <- 0
+  for (i in 1:k) {
+    y1 <- runif(1, min = -1000, max = 1000)
+    df <- runif(1, min = 1, max = 100)
+    mu <- runif(1, min = -100, max = 100)
+    s <- runif(1, min = 1, max = 20)
+
+    score1 <- SCRPS_t(y1,df = df, location = mu, scale = s)
+    sample1 <- rstudent_t(n, df = df, mu = mu, sigma = s)
+    E1 <- mean(abs(sample1 - y1))
+    sample1 <- rstudent_t(n, df = df, mu = mu, sigma = s)
+    sample2 <- rstudent_t(n, df = df, mu = mu, sigma = s)
+    E2 <- mean(abs(sample1 - sample2))
+    score2 <- -E1/E2 - 0.5*log(E2)
+
+    if (abs((score1 - score2)/(score1+10^-8)) < 0.05) {
+      count <- count + 1
+    }
+
+  }
+
+
+
+
+
+  accuracy = count/k
+
+  expect_gt(accuracy, 0.95)
+
+
+} )
+
+
+
+
+
+
+
+
+
+
+
+
+
+test_that("SCRPS for lognormal distribution", {
+
+
+  n <- 100000
+  k <- 50
+  count <- 0
+  for (i in 1:k) {
+    y1 <- runif(1, min = -1000, max = 1000)
+    mu <- runif(1, min = -7, max = 7)
+    s <- runif(1, min = 0.2, max = 2.5)
+
+    score1 <- SCRPS_lnorm(y1,meanlog = mu, sdlog = s)
+    sample1 <- rlnorm(n, meanlog = mu, sdlog = s)
+    E1 <- mean(abs(sample1 - y1))
+    sample1 <- rlnorm(n, meanlog = mu, sdlog = s)
+    sample2 <- rlnorm(n, meanlog = mu, sdlog = s)
+    E2 <- mean(abs(sample1 - sample2))
+    score2 <- -E1/E2 - 0.5*log(E2)
+
+    if (abs((score1 - score2)/(score1+10^-8)) < 0.05) {
+      count <- count + 1
+    }
+
+  }
+
+
+
+
+
+  accuracy = count/k
+
+  expect_gt(accuracy, 0.95)
+
+
+} )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
+#
+#
+#
+# test_that("SCRPS for loglaplace distribution", {
+#
+#   library("ExtDist")
+#   n <- 100000
+#   k <- 50
+#   count <- 0
+#   for (i in 1:k) {
+#     y1 <- runif(1, min = -1000, max = 1000)
+#     mu <- runif(1, min = -3, max = 3)
+#     s <- runif(1, min = 0.05, max = 0.95)
+#
+#     score1 <- SCRPS_llapl(y1,locationlog = mu, scalelog = s)
+#     sample1 <- rLaplace(n,mu = mu, b = s)
+#     sample1 <- exp(sample1)
+#     E1 <- mean(abs(sample1 - y1))
+#     sample1 <- rLaplace(n,mu = mu, b = s)
+#     sample2 <- rLaplace(n,mu = mu, b = s)
+#     sample1 <- exp(sample1)
+#     sample2 <- exp(sample2)
+#     E2 <- mean(abs(sample1 - sample2))
+#     score2 <- -E1/E2 - 0.5*log(E2)
+#
+#     if (abs((score1 - score2)/(score1+10^-8)) < 0.05) {
+#       count <- count + 1
+#     }
+#
+#   }
+#
+#
+#
+#
+#
+#   accuracy = count/k
+#
+#   expect_gt(accuracy, 0.95)
+#
+#
+# } )
+#
+
