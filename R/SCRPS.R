@@ -319,3 +319,5 @@ SCRPS_lnorm <- function(y, meanlog = 0, sdlog = 1){
 #'
 
 
+# \eqn(x+y) <-> $x+y$
+# \deqn(x+y) <-> $$x+y$$

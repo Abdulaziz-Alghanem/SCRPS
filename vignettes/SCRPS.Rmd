@@ -367,6 +367,3 @@ $$ z =   \left\{
 and $F_{\mu, \sigma}$ is the cumulative distribution function for the lognormal distribution with locationlog parameter $\mu$ and scalelog parameter $\sigma$, and $\Phi$ is the cumulative distribution function for the standard normal distribution. 
 
 
-
-
-
