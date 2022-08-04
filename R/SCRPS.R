@@ -266,6 +266,7 @@ SCRPS_lnorm <- function(y, meanlog = 0, sdlog = 1){
   ifelse(y <= 0, temp <- 0,  temp <- stats::pnorm((log(y) - meanlog - sdlog^2)/sdlog))
   E1 <- y*(2*stats::plnorm(y,meanlog = meanlog, sdlog = sdlog) - 1) -2*exp(meanlog + (sdlog^2)/2)*(temp-0.5)
   E2 <- 4*exp(meanlog + (sdlog^2)/2)*(stats::pnorm(sdlog/sqrt(2))-0.5)
+
   score <- -E1/E2 - 0.5*log(E2)
   return(score)
 }
@@ -281,7 +282,7 @@ SCRPS_lnorm <- function(y, meanlog = 0, sdlog = 1){
 #'
 #'
 #'
-#' #' SCRPS for log-laplace distribution
+#' #' SCRPS for Log-laplace distribution
 #' #'
 #' #'@description
 #' #'  Calculates the SCRPS for observations \code{y} and loglaplace distribution with locationlog parameter \code{locationlog} and scalelog parameter \code{scalelog}.
@@ -317,6 +318,8 @@ SCRPS_lnorm <- function(y, meanlog = 0, sdlog = 1){
 #'   return(score)
 #' }
 #'
+
+
 
 
 # \eqn(x+y) <-> $x+y$
