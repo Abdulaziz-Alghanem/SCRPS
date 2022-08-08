@@ -31,9 +31,6 @@
     <loc>https://abdulaziz-alghanem.github.io/SCRPS/reference/SCRPS_gamma.html</loc>
   </url>
   <url>
-    <loc>https://abdulaziz-alghanem.github.io/SCRPS/reference/SCRPS_inla.html</loc>
-  </url>
-  <url>
     <loc>https://abdulaziz-alghanem.github.io/SCRPS/reference/SCRPS_lapl.html</loc>
   </url>
   <url>
@@ -53,5 +50,14 @@
   </url>
   <url>
     <loc>https://abdulaziz-alghanem.github.io/SCRPS/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://abdulaziz-alghanem.github.io/SCRPS/reference/scrps.html</loc>
+  </url>
+  <url>
+    <loc>https://abdulaziz-alghanem.github.io/SCRPS/reference/scrps.inla.html</loc>
+  </url>
+  <url>
+    <loc>https://abdulaziz-alghanem.github.io/SCRPS/reference/scrps.inlaa.html</loc>
   </url>
 </urlset>
