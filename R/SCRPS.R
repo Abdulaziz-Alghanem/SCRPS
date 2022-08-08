@@ -185,6 +185,7 @@ SCRPS_2pnorm <- function(y, mu = 0, sd1 = 1, sd2 = 1){
 #' @description
 #'  Calculates the SCRPS for observations \code{y} and gamma distribution with shape parameter \code{shape} and scale parameter \code{scale} or alternatively rate parameter \code{rate} = 1/\code{scale}.
 #'
+#'
 #' @param y Vector of observations.
 #' @param shape Vector of shape parameters. Must be positive.
 #' @param rate An alternative way to specify the scale.
@@ -199,6 +200,7 @@ SCRPS_2pnorm <- function(y, mu = 0, sd1 = 1, sd2 = 1){
 
 SCRPS_gamma <- function(y, shape = 1, rate = 1, scale = 1/rate){
   E1 <- 2*y*stats::pgamma(y,shape = shape, scale = scale) - y - 2*shape*scale*stats::pgamma(y, shape = shape+1, scale = scale) + shape*scale
+  #E1 <- 2*y*pgamma(y,shape = shape, scale = scale) - y - 2*shape*scale*pgamma(y, shape = shape+1, scale = scale) + shape*scale
   E2 <- 2*scale/beta(1/2, shape)
   score <- -E1/E2 - 0.5*log(E2)
   return(score)
