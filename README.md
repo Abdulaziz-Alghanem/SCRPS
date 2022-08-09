@@ -28,7 +28,7 @@ A package for evaluation of probabilistic forecasts using proper scoring rules. 
 # how to install 
 
 You can install the package by running the command 
-```
+```r
 remotes::install_github("Abdulaziz-Alghanem/SCRPS")
 
 ```
