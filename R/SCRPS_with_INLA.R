@@ -11,7 +11,7 @@
 #' #to be completed
 score <- function(x, ...) {
 
-  UseMethod("scrps")
+  UseMethod("score")
 
 
 }
