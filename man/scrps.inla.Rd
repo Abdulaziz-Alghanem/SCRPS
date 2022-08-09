@@ -6,6 +6,7 @@
 \usage{
 \method{scrps}{inla}(
   inla_result,
+  scoring_rule = "scrps",
   n = 10000,
   test_data = NULL,
   full_y = NULL,
