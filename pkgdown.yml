@@ -3,7 +3,7 @@ pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
   SCRPS: SCRPS.html
-last_built: 2022-08-09T10:41Z
+last_built: 2022-08-09T11:18Z
 urls:
   reference: https://abdulaziz-alghanem.github.io/SCRPS/reference
   article: https://abdulaziz-alghanem.github.io/SCRPS/articles
