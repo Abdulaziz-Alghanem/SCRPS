@@ -423,6 +423,41 @@ test_that("SCRPS for lognormal distribution", {
 
 
 
+test_that("SCRPS for beta distribution", {
+
+
+  n <- 100000
+  k <- 50
+  count <- 0
+  for (i in 1:k) {
+    y1 <- runif(1, min = -20, max = 20)
+    a <- runif(1, min = 0.05, max = 20)
+    b <- runif(1, min = 0.05, max = 20)
+
+    score1 <- SCRPS_beta(y1,shape1 = a, shape2 = b)
+    sample1 <- rbeta(n, shape1 = a, shape2 = b)
+    E1 <- mean(abs(sample1 - y1))
+    sample1 <- rbeta(n, shape1 = a, shape2 = b)
+    sample2 <- rbeta(n, shape1 = a, shape2 = b)
+    E2 <- mean(abs(sample1 - sample2))
+    score2 <- -E1/E2 - 0.5*log(E2)
+
+    if (abs((score1 - score2)/(score1+10^-8)) < 0.05) {
+      count <- count + 1
+    }
+
+  }
+
+
+
+
+
+  accuracy = count/k
+
+  expect_gt(accuracy, 0.95)
+
+
+} )
 
 
 
@@ -434,47 +469,7 @@ test_that("SCRPS for lognormal distribution", {
 
 
 
-#
-#
-#
-#
-# test_that("SCRPS for loglaplace distribution", {
-#
-#   library("ExtDist")
-#   n <- 100000
-#   k <- 50
-#   count <- 0
-#   for (i in 1:k) {
-#     y1 <- runif(1, min = -1000, max = 1000)
-#     mu <- runif(1, min = -3, max = 3)
-#     s <- runif(1, min = 0.05, max = 0.95)
-#
-#     score1 <- SCRPS_llapl(y1,locationlog = mu, scalelog = s)
-#     sample1 <- rLaplace(n,mu = mu, b = s)
-#     sample1 <- exp(sample1)
-#     E1 <- mean(abs(sample1 - y1))
-#     sample1 <- rLaplace(n,mu = mu, b = s)
-#     sample2 <- rLaplace(n,mu = mu, b = s)
-#     sample1 <- exp(sample1)
-#     sample2 <- exp(sample2)
-#     E2 <- mean(abs(sample1 - sample2))
-#     score2 <- -E1/E2 - 0.5*log(E2)
-#
-#     if (abs((score1 - score2)/(score1+10^-8)) < 0.05) {
-#       count <- count + 1
-#     }
-#
-#   }
-#
-#
-#
-#
-#
-#   accuracy = count/k
-#
-#   expect_gt(accuracy, 0.95)
-#
-#
-# } )
-#
+
+
+
 

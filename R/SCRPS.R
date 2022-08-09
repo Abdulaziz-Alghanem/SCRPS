@@ -279,47 +279,31 @@ SCRPS_lnorm <- function(y, meanlog = 0, sdlog = 1){
 
 
 
+#' SCRPS for beta distribution
+#'
+#'@description
+#'  Calculates the SCRPS for observations \code{y} and beta distribution with shape1 parameter \code{shape1} and shape2 parameter \code{shape2}.
+#'
+#' @param y Vector of observations.
+#' @param shape1 Vector of shape1 parameters. Must be positive.
+#' @param shape2 Vector of shape2 parameters. Must be positive.
+#'
+#' @return Vector of scores.
+#' @export
+#'
+#' @examples
+#' SCRPS_beta(1,1,1)
+SCRPS_beta <- function(y, shape1, shape2) {
 
 
-#'
-#'
-#'
-#' #' SCRPS for Log-laplace distribution
-#' #'
-#' #'@description
-#' #'  Calculates the SCRPS for observations \code{y} and loglaplace distribution with locationlog parameter \code{locationlog} and scalelog parameter \code{scalelog}.
-#' #'
-#' #' @param y Vector of observations.
-#' #' @param locationlog Vector of locationlog parameters.
-#' #' @param scalelog Vector of scalelog parameters. Must be between 0 and 1
-#' #'
-#' #' @return Vector of scores.
-#' #' @export
-#' #'
-#' #' @examples
-#' #' SCRPS_llapl(1,2,0.7)
-#' SCRPS_llapl <- function(y, locationlog = 0, scalelog = 0.5){
-#'
-#'   FF <- function(x, locationlog, scalelog ) {
-#'     ifelse(x <= 0,0,0.5*(1 + sign(log(x)- locationlog)*(1-exp(-abs(log(x)- locationlog)/scalelog))))
-#'
-#'   }
-#'
-#'   A <- function(x, locationlog, scalelog) {
-#'
-#'     ifelse(x < exp(locationlog), (1-(2*FF(x,locationlog,scalelog))^(1+scalelog))/(1+scalelog) , (1- (2*(1- FF(x,locationlog,scalelog)))^(1-scalelog))/(scalelog - 1) )
-#'
-#'
-#'
-#'   }
-#'
-#'
-#'   E1 <- y*(2*FF(y,locationlog,scalelog) - 1) + exp(locationlog)*(A(y,  locationlog, scalelog))
-#'   E2 <-  0.25*exp(locationlog)*((scalelog/(scalelog^2-4)))
-#'   score <- -E1/E2 - 0.5*log(E2)
-#'   return(score)
-#' }
-#'
+  E1 <- y*(2*stats::pbeta(y, shape1 = shape1, shape2 = shape2) - 1) + shape1/(shape1 + shape2)*(1 - 2*stats::pbeta(y, shape1 = shape1 + 1, shape2 = shape2))
+  E2 <- 4*shape1/(shape1 + shape2) * ( (beta(2*shape1, 2*shape2))/(shape1*beta(shape1,shape2)^2)   )
+  score <- -E1/E2 - 0.5*log(E2)
+  return(score)
+
+}
+
+
 
 
 

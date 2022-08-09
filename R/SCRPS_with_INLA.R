@@ -27,9 +27,11 @@ score <- function(x, ...) {
 
 
 
-#' scores for inla
+
+#' Title
 #'
 #' @param inla_result b
+#' @param scoring_rule b
 #' @param n b
 #' @param test_data b
 #' @param full_y b
@@ -37,6 +39,7 @@ score <- function(x, ...) {
 #' @param only_test_data b
 #' @param parallelize b
 #' @param n.cores b
+#' @param ... b
 #'
 #' @return b
 #' @export
@@ -49,7 +52,7 @@ score.inla <- function(inla_result,scoring_rule = "scrps", n = 10000,
                             test_idx = NULL,
                             only_test_data = TRUE,
                             parallelize = FALSE,
-                            n.cores = parallel::detectCores()-1) {
+                            n.cores = parallel::detectCores()-1, ...) {
 
 
   #work with the right y

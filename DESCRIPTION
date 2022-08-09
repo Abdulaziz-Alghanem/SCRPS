@@ -3,9 +3,8 @@ Type: Package
 Title: Evaluation of Probabilistic Forecasts Based on Locally Scale Invariant Proper Scoring Rules
 Version: 0.1.0
 Author: Abdulaziz Alghanem
-Maintainer: <Ghanem-A@outlook.com>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Maintainer: Abdulaziz Alghanem <Ghanem-A@outlook.com>
+Description: Evaluation of Probabilistic Forecasts Based on Locally Scale Invariant Proper Scoring Rules.
 License: GPL-3
 Encoding: UTF-8
 Imports:

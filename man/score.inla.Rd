@@ -2,7 +2,7 @@
 % Please edit documentation in R/SCRPS_with_INLA.R
 \name{score.inla}
 \alias{score.inla}
-\title{scores for inla}
+\title{Title}
 \usage{
 \method{score}{inla}(
   inla_result,
@@ -13,11 +13,14 @@
   test_idx = NULL,
   only_test_data = TRUE,
   parallelize = FALSE,
-  n.cores = parallel::detectCores() - 1
+  n.cores = parallel::detectCores() - 1,
+  ...
 )
 }
 \arguments{
 \item{inla_result}{b}
+
+\item{scoring_rule}{b}
 
 \item{n}{b}
 
@@ -32,12 +35,14 @@
 \item{parallelize}{b}
 
 \item{n.cores}{b}
+
+\item{...}{b}
 }
 \value{
 b
 }
 \description{
-scores for inla
+Title
 }
 \examples{
 #to be completed

@@ -367,3 +367,42 @@ $$ z =   \left\{
 and $F_{\mu, \sigma}$ is the cumulative distribution function for the lognormal distribution with locationlog parameter $\mu$ and scalelog parameter $\sigma$, and $\Phi$ is the cumulative distribution function for the standard normal distribution. 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# SCRPS for beta distribution
+
+Implementation using the following expression:   
+$\text{SCRPS}(\text{Beta}(\alpha,\beta),y) = -\frac{E_1}{E_2} - \frac{1}{2}\log(E_2)$  
+
+where 
+$$ E_1 = y(2F_{\alpha,\beta}(y)-1) + \frac{\alpha}{\alpha + \beta}(1 - 2F_{\alpha+1,\beta}(y)) $$
+
+and 
+
+$$E_2 =   \frac{4\alpha}{\alpha + \beta} \left ( \frac{B(2\alpha,2\beta)}{\alpha B(\alpha, \beta)^2}     \right)$$
+
+
+
+and $F_{\alpha, \beta}$ is the cumulative distribution function for the beta distribution with shape1 parameter $\alpha$ and shape2 parameter $\beta$, and $B$ is the beta function. 
+
