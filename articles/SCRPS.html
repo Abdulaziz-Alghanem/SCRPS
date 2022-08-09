@@ -273,6 +273,15 @@
 \right.  \]</span></p>
 <p>and <span class="math inline">\(F_{\mu, \sigma}\)</span> is the cumulative distribution function for the lognormal distribution with locationlog parameter <span class="math inline">\(\mu\)</span> and scalelog parameter <span class="math inline">\(\sigma\)</span>, and <span class="math inline">\(\Phi\)</span> is the cumulative distribution function for the standard normal distribution.</p>
 </div>
+<div class="section level2">
+<h2 id="scrps-for-beta-distribution">SCRPS for beta distribution<a class="anchor" aria-label="anchor" href="#scrps-for-beta-distribution"></a>
+</h2>
+<p>Implementation using the following expression:<br><span class="math inline">\(\text{SCRPS}(\text{Beta}(\alpha,\beta),y) = -\frac{E_1}{E_2} - \frac{1}{2}\log(E_2)\)</span></p>
+<p>where <span class="math display">\[ E_1 = y(2F_{\alpha,\beta}(y)-1) + \frac{\alpha}{\alpha + \beta}(1 - 2F_{\alpha+1,\beta}(y)) \]</span></p>
+<p>and</p>
+<p><span class="math display">\[E_2 =   \frac{4\alpha}{\alpha + \beta} \left ( \frac{B(2\alpha,2\beta)}{\alpha B(\alpha, \beta)^2}     \right)\]</span></p>
+<p>and <span class="math inline">\(F_{\alpha, \beta}\)</span> is the cumulative distribution function for the beta distribution with shape1 parameter <span class="math inline">\(\alpha\)</span> and shape2 parameter <span class="math inline">\(\beta\)</span>, and <span class="math inline">\(B\)</span> is the beta function.</p>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -287,7 +296,7 @@
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by .</p>
+<p>Developed by Abdulaziz Alghanem.</p>
 </div>
 
 <div class="pkgdown">
