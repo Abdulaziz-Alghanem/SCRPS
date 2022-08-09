@@ -222,9 +222,35 @@ inla_score_for_i <- function(inla_result, y, s, i, n, scoring_rule) {
 
 
 
+    #################################################################
+    ####################      "Logistic"      #########################
+    #################################################################
+  } else if (inla_result$.args$family == "logistic") {
+
+
+    mu_sample <- INLA::inla.rmarginal(n, inla_result$marginals.fitted.values[[i]])
+    tau_sample <- INLA::inla.rmarginal(n,inla_result$marginals.hyperpar$`precision for the logistic observations`)
+
+    scale_sample <- sqrt(3)/(pi*s*tau_sample)
+
+    if (scoring_rule == "scrps") {
+      temp <- SCRPS::SCRPS_logis(y, location = mu_sample, scale = scale_sample)
+
+    } else if (scoring_rule == "crps") {
+
+      temp <- -scoringRules::crps_logis(y, location = mu_sample, scale = scale_sample)
+
+    }
+
+
+    return(temp)
+
+
+
+
+
 
   }
-
 
 
 }
