@@ -1,4 +1,4 @@
-#' Title
+#' Generic score function
 #'
 #'
 #' @param x b
@@ -9,7 +9,7 @@
 #'
 #' @examples
 #' #to be completed
-scrps <- function(x, ...) {
+score <- function(x, ...) {
 
   UseMethod("scrps")
 
@@ -27,7 +27,7 @@ scrps <- function(x, ...) {
 
 
 
-#' Title scrps for inla
+#' scores for inla
 #'
 #' @param inla_result b
 #' @param n b
@@ -43,7 +43,7 @@ scrps <- function(x, ...) {
 #'
 #' @examples
 #' #to be completed
-scrps.inla <- function(inla_result,scoring_rule = "scrps", n = 10000,
+score.inla <- function(inla_result,scoring_rule = "scrps", n = 10000,
                             test_data = NULL,
                             full_y = NULL,
                             test_idx = NULL,
